@@ -1,29 +1,29 @@
 # Syslog : The Complete System Administrator Guide
 ## Mục lục
 
-- [Tổng quan về Log](log)
-- [Tổng quan Syslog](syslog)
+- [Tổng quan về Log](#log)
+- [Tổng quan Syslog](#syslog)
 
-[I - Mục đích của Syslog?](I)
+[I - Mục đích của Syslog?](#I)
 
-[II - Kiến trúc Syslog?](II)
+[II - Kiến trúc Syslog?](#II)
 
-[III - Định dạng tin nhắn Syslog?](III)
+[III - Định dạng tin nhắn Syslog?](#III)
 
-- [a - Cấp độ cơ sở Syslog (Syslog facility levels)?](3a)
+- [a - Cấp độ cơ sở Syslog (Syslog facility levels)?](#3a)
    
-- [b - Mức độ cảnh báo của Syslog (Syslog severity levels)?](3b)
+- [b - Mức độ cảnh báo của Syslog (Syslog severity levels)?](#3b)
    
-- [c - PRI?](3c)
+- [c - PRI?](#3c)
    
-- [d - Header?](3d)
+- [d - Header?](#3d)
 
-[IV - Syslog gửi tin nhắn hoạt động như thế nào?](IV)
+[IV - Syslog gửi tin nhắn hoạt động như thế nào?](#IV)
 
-- [a - Chuyển tiếp nhật ký hệ thống là gì?](4a)
-- [b - Syslog có sử dụng TCP hoặc UDP không?](4b)
+- [a - Chuyển tiếp nhật ký hệ thống là gì?](#4a)
+- [b - Syslog có sử dụng TCP hoặc UDP không?](#4b)
 
-[V - Quá trình phát triển?](V)
+[V - Quá trình phát triển?](#V)
 
 
 ---------------------------
