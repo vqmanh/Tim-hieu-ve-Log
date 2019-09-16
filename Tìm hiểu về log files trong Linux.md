@@ -5,25 +5,25 @@
 
 ## **Sau đây là 20 tệp log khác nhau được đặt trong thư mục `/var/log/`.**
 
-- `/var/log/message` - Chứa các thông báo hệ thống toàn cầu, bao gồm các tin nhắn được ghi lại trong quá trình khởi động hệ thống. Có một số thứ được đăng nhập / var / log / message bao gồm mail, cron, daemon, kern, auth, v.v.
+- `/var/log/message` - Chứa các thông báo hệ thống toàn cầu, bao gồm các tin nhắn được ghi lại trong quá trình khởi động hệ thống. Có một số thứ được đăng nhập `/var/log/message` bao gồm mail, cron, daemon, kern, auth, v.v.
 - `/var/log/dmesg` - Chứa thông tin bộ đệm vòng kernel. Khi hệ thống khởi động, nó sẽ in số lượng tin nhắn trên màn hình hiển thị thông tin về các thiết bị phần cứng mà hạt nhân phát hiện được trong quá trình khởi động. Các tin nhắn này có sẵn trong bộ đệm vòng kernel và bất cứ khi nào tin nhắn mới xuất hiện, tin nhắn cũ sẽ bị ghi đè. Bạn cũng có thể xem nội dung của tệp này bằng lệnh `dmesg` .
 - `/var/log/auth.log` - Chứa thông tin ủy quyền hệ thống, bao gồm thông tin đăng nhập người dùng và máy móc xác thực đã được sử dụng.
 - `/var/log/boot.log` - Chứa thông tin được ghi lại khi hệ thống khởi động
 - `/var/log/daemon.log` - Chứa thông tin được ghi lại bởi các trình nền khác nhau chạy trên hệ thống
 - `/var/log/dpkg.log` - Chứa thông tin được ghi lại khi gói được cài đặt hoặc gỡ bỏ bằng lệnh dpkg
 - `/var/log/kern.log` - Chứa thông tin được ghi bởi kernel. Hữu ích cho bạn để khắc phục sự cố một kernel được xây dựng tùy chỉnh.
-- `/var/log/lastlog` - Hiển thị thông tin đăng nhập gần đây cho tất cả người dùng. Đây không phải là một tập tin ascii. Bạn nên sử dụng lệnh Lastlog để xem nội dung của tệp này.
+- `/var/log/lastlog` - Hiển thị thông tin đăng nhập gần đây cho tất cả người dùng. Đây không phải là một tập tin ascii. Bạn nên sử dụng lệnh `Lastlog` để xem nội dung của tệp này.
 - `/var/log/maillog /var/log/mail.log` - Chứa thông tin nhật ký từ máy chủ thư đang chạy trên hệ thống. Ví dụ: sendmail ghi thông tin về tất cả các mục đã gửi vào tệp này
 - `/var/log/user.log` - Chứa thông tin về tất cả nhật ký cấp độ người dùng
 - `/var/log/Xorg.x.log` - Đăng nhập tin nhắn từ X
 - `/var/log/alternatives.log` - Thông tin của các lựa chọn thay thế cập nhật được đăng nhập vào tệp nhật ký này. Trên Ubuntu, các lựa chọn thay thế cập nhật duy trì các liên kết tượng trưng xác định các lệnh mặc định.
-- `/var/log/btmp` - Tập tin này chứa thông tin về các thông tin đăng nhập thất bại. Sử dụng lệnh cuối cùng để xem tệp `btmp`. Ví dụ, “last -f /var/log/btmp | more”
+- `/var/log/btmp` - Tập tin này chứa thông tin về các thông tin đăng nhập thất bại. Sử dụng lệnh cuối cùng để xem tệp `btmp`. Ví dụ, “`last -f /var/log/btmp | more`”
 - `/var/log/cups` - Tất cả máy in và in các thông điệp nhật ký liên quan
 - `/var/log/anaconda.log` - Khi bạn cài đặt Linux, tất cả các thông báo liên quan đến cài đặt được lưu trữ trong tệp nhật ký này
 - `/var/log/yum.log` - Chứa thông tin được ghi lại khi gói được cài đặt bằng yum
 - `/var/log/cron` - Bất cứ khi nào cron daemon (hoặc anacron ) bắt đầu một công việc cron, nó sẽ ghi lại thông tin về công việc cron trong tệp này
 - `/var/log/secure` - Chứa thông tin liên quan đến xác thực và đặc quyền ủy quyền. Ví dụ: sshd ghi lại tất cả các tin nhắn ở đây, bao gồm cả đăng nhập không thành công.
-- `/var/log/wtmp` hoặc `/var/log/utmp` - Chứa hồ sơ đăng nhập. Sử dụng wtmp bạn có thể tìm ra ai đã đăng nhập vào hệ thống. lệnh ai sử dụng tập tin này để hiển thị thông tin.
+- `/var/log/wtmp` hoặc `/var/log/utmp` - Chứa hồ sơ đăng nhập. Sử dụng `wtmp` bạn có thể tìm ra ai đã đăng nhập vào hệ thống. 
 - `/var/log/faillog` - Chứa người dùng đăng nhập thất bại. Sử dụng lệnh faillog để hiển thị nội dung của tệp này.
 
 ### **Ngoài các tệp nhật ký trên, thư mục `/var/log` cũng có thể chứa các thư mục con sau tùy thuộc vào ứng dụng đang chạy trên hệ thống của bạn.**
@@ -48,8 +48,8 @@
     - `tail -f /var/log/maillog`
 
 - Một số log Linux như các tập tin nhị phân mà cần phải được phân tích bởi một ứng dụng được thiết kế đặc biệt. Những bản ghi này được lưu trong `/var/log/wtmp` `/var/log/btmp` và `/var/run/utmp`.
-    - Để xem nội dung của thư mục /var/log/wtmp dùng: `last`
-    - Để xem nội dung của thư mục /var/log/btmp dùng: `lastb`
+    - Để xem nội dung của thư mục /var/log/wtmp dùng: `last -f`
+    - Để xem nội dung của thư mục /var/log/btmp dùng: `lastb -f`
     - Để xem nội dung của thư mục /var/run/utmp dùng: `who`
 
 #### Tập tin log cụ thể trên Cpanel 
