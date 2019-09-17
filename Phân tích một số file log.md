@@ -3,15 +3,24 @@
 
 ## log SSH:
 ```
-[root@vqmanh ~]# tailf /var/log/secure | grep ssh
+[root@vqmanh ~]# tailf /var/log/secure | grep ssh 
+Login thành công
 Sep 17 08:04:28 vqmanh sshd[10703]: pam_unix(sshd:session): session opened for user vqmanh by (uid=0)
 Sep 17 08:04:29 vqmanh sshd[10709]: reverse mapping checking getaddrinfo for 254-0-0-66.deltacom.net [66.0.0.254] failed - POSSIBLE BREAK-IN ATTEMPT!
 Sep 17 08:04:29 vqmanh sshd[10709]: Accepted password for vqmanh from 66.0.0.254 port 58710 ssh2
 Sep 17 08:04:29 vqmanh sshd[10709]: pam_unix(sshd:session): session opened for user vqmanh by (uid=0)
-
+---------------
+Login thất bại
 Sep 17 08:33:19 vqmanh unix_chkpwd[11264]: password check failed for user (pak)
 Sep 17 08:33:19 vqmanh sshd[11262]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=66.0.0.254  user=pak
 Sep 17 08:33:21 vqmanh sshd[11262]: Failed password for pak from 66.0.0.254 port 58954 ssh2
+-----------------------
+Login sai user
+Sep 17 10:40:37 vqm sshd[10668]: Invalid user vqmanh from 66.0.0.254 port 60347
+Sep 17 10:40:37 vqm sshd[10668]: input_userauth_request: invalid user vqmanh [preauth]
+Sep 17 10:40:37 vqm sshd[10668]: pam_unix(sshd:auth): check pass; user unknown
+Sep 17 10:40:37 vqm sshd[10668]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=66.0.0.254
+Sep 17 10:40:39 vqm sshd[10668]: Failed password for invalid user vqmanh from 66.0.0.254 port 60347 ssh2
 
 ```
 Note:
