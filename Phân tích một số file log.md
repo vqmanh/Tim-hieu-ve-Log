@@ -21,6 +21,8 @@ Sep 17 10:40:37 vqm sshd[10668]: input_userauth_request: invalid user vqmanh [pr
 Sep 17 10:40:37 vqm sshd[10668]: pam_unix(sshd:auth): check pass; user unknown
 Sep 17 10:40:37 vqm sshd[10668]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=66.0.0.254
 Sep 17 10:40:39 vqm sshd[10668]: Failed password for invalid user vqmanh from 66.0.0.254 port 60347 ssh2
+--------------
+
 
 ```
 Note:
@@ -39,6 +41,13 @@ tailf /var/log/messages
 Sep 17 08:19:10 vqmanh systemd: Started Session 8 of user vqmanh.
 Sep 17 08:19:10 vqmanh systemd-logind: New session 8 of user vqmanh.
 ```
+## Log out
+
+```
+[root@vqm ~]# tailf /var/log/secure |grep ssh
+Sep 17 11:11:25 vqm sshd[10699]: pam_unix(sshd:session): session closed for user root
+```
+
 
 ## Network
 ```
