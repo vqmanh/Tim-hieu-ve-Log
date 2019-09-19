@@ -74,6 +74,7 @@ Dưới đây là một vài lý do tại sao giao thức **syslog** được th
 
 <img src=https://imgur.com/BPFsRLZ.png>
 
+<a name = "III"></a>
 ## III - Định dạng tin nhắn Syslog?
 
 <img src=https://imgur.com/mrgLnFa.png>
