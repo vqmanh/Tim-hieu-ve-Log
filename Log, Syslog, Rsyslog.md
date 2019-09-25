@@ -1,4 +1,4 @@
-# Syslog : The Complete System Administrator Guide
+# Tìm hiểu Log, Syslog, Rsyslog
 ## Mục lục
 
 - [Tổng quan về Log](#log)
