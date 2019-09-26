@@ -27,12 +27,13 @@
 - [b - Cấu hình rsyslog client](#3b)
 
 [IV - Mã hóa tin nhắn rsyslog bằng TLS](#4)
-- [a - Cấu hình quyền chứng chỉ của bạn](#4a)
+- [a - Cấu hình quyền chứng chỉ](#4a)
 - [b - Tạo khóa riêng / chung cho máy chủ](#4b)
 - [c - Tạo khóa riêng / chung cho khách hàng](#4c)
-- [d - Gửi các khóa được tạo đến máy chủ của bạn](#4d)
-- [e - Cấu hình máy chủ rsyslog của bạn](#4e)
-- [f - Cấu hình máy khách rsyslog của bạn](4f)
+- [d - Gửi các khóa được tạo đến máy chủ](#4d)
+- [e - Cấu hình máy chủ rsyslog](#4e)
+- [f - Cấu hình máy khách rsyslog](4f)
+
 [V - Gửi tin nhắn nhật ký đáng tin cậy với hàng đợi hành động](#5)
 - [a - Thiết kế độ tin cậy của tin nhắn](#5a)
 - [b - Thể hiện độ tin cậy của tin nhắn](#5b)
@@ -44,9 +45,9 @@
 - [b - Hệ thống ghi nhật ký đẩy và kéo](#7b)
 
 ----------------------------
-
+<a name = "1"></a>
 ## I - Logging hoạt động như thê nào?
-
+<a name = "1a"></a>
 ### a - Khái niệm chung về logging
 
 - Linux sử dụng giao thức `syslog` xác định một tiêu chuẩn cho mọi khía cạnh khi đăng nhập vào hệ điều hành (không chỉ Linux mà cả Windows): xác định thông điệp trông như thế nào, mô tả (`severity levels`) mức độ nghiêm trọng của tin nhắn, cũng như liệt kê các cổng mà `syslog` sẽ đang sử dụng.
@@ -62,16 +63,16 @@
 - `Rsyslog` là một sự phát triển của `syslog`, cung cấp các khả năng như các mô đun có thể cấu hình, được liên kết với nhiều mục tiêu khác nhau (ví dụ chuyển tiếp nhật ký Apache đến một máy chủ từ xa).
 
 - `Rsyslog` cũng cung cấp tính năng lọc riêng cũng như tạo khuôn mẫu để định dạng dữ liệu sang định dạng tùy chỉnh.
-
+<a name = "1b"></a>
 ### b - Log được lưu ở đâu?
 
 - Log được lưu trữ tại `/var/log` trên hệ thống.
 - `/var/log` không chỉ chứa các tệp mà còn chứa các thư mục chuyên dụng mà nhà cung cấp tạo khi ứng dụng được cài đặt.
 
-Đây là cấu trúc thư mục ở phía máy chủ.
+**Đây là cấu trúc thư mục ở phía máy chủ.**
 
 <img src= https://imgur.com/qbyGJ23.jpg>
-
+<a name = "2"></a>
 ## II - Tổng quan về Log tập trung
 
 **Tác dụng của log là vô cùng to lớn vậy làm thế nào để quản lý log tốt hơn?**
@@ -105,9 +106,121 @@
 - Bạn có nguy cơ quá tải máy chủ `syslog` của mình: với cấu ​​trúc này, bạn đang đẩy các bản ghi đến một máy chủ từ xa. Hậu quả là, nếu một máy bị tấn công và bắt đầu gửi hàng ngàn log messages, có nguy cơ làm quá tải máy chủ log.
 - Nếu máy chủ nhật ký của bạn bị hỏng, bạn sẽ mất khả năng xem tất cả các nhật ký được gửi bởi khách hàng. Hơn nữa, nếu máy chủ ngừng hoạt động, máy khách sẽ bắt đầu lưu trữ thư cục bộ cho đến khi máy chủ khả dụng trở lại, do đó không gian đĩa ở phía máy khách sẽ dần bị đầy.
 
+
+<a name = "3"></a>
 ## III - Cấu hình `rsyslog` để chuyển tiếp log đến máy chủ tập trung
 
 **Mặc định file cấu hình `rsyslog` sẽ được lưu trên thư mục `/etc/` bao gồm file `rsyslog.conf` và thư mục `rsyslog.d`**
-
 <img src=https://imgur.com/3e8KL7r.jpg>
+
+### Mô hình:
+
+<img src=https://imgur.com/bvcvrel.jpg>
+
+### IP Planning
+
+Tên máy ảo|	Hệ điều hành|	IP address|	Subnet mask|	Default gateway
+------|-----|----------|--------|-----
+Rsyslog Server| CentOS7|66.0.0.199|/24|66.0.0.1
+Rsyslog Client1|CentOS7|66.0.0.200|/24|66.0.0.1
+Rsyslog Client2|Ubuntu19.04|66.0.0.113|/24|66.0.0.1
+### Triển khai
+<a name = "3a"></a>
+### a - Cấu hình Rsyslog Server
+**Bước 1: Chỉnh sửa trong file cấu hình /etc/rsyslog.conf của máy chủ Syslog-server để nó có thể nhận các bản tin log từ các client gửi về.**
+
+- Bỏ comment 2 dòng sau: bạn có thể lựa chọn sử dụng UDP hoặc TCP, ở đây mình bỏ comment dòng UDP
+
+<img src=https://imgur.com/5aab9K2.jpg>
+
+- Để máy chủ log tạo thành các thư mục lưu riêng log đối với từng máy Client gửi về thêm dòng này vào cuối file cấu hình.
+
+```
+$template RemoteServer, "/var/log/%HOSTNAME%/%SYSLOGFACILITY-TEXT%.log"
+*.* ?RemoteServer
+```
+
+<img src=https://imgur.com/pSeTixx.jpg>
+
+*Với cú pháp này, các tệp nhật sẽ được nhóm theo tên máy client gửi `log` và sau đó theo cơ sở `syslog` (kern, user, auth, v.v.)*
+
+**Bước 2: Khởi động lại máy chủ rsyslog của bạn và đảm bảo rằng nó hiện đang lắng nghe trên cổng 514 cho UDP hoặc TCP**
+
+```
+[root@vqmanh ~]# systemctl restart rsyslog
+[root@vqmanh ~]# netstat -una | grep :514
+udp        0      0 0.0.0.0:514             0.0.0.0:*
+udp6       0      0 :::514                  :::*
+# Nếu bạn sử dụng TCP có thể sử dụng lệnh:  
+netstat -tna | grep :514
+```
+<a name = "3b"></a>
+### b - Cấu hình Rsyslog Client
+
+### **Đối với client CentOS7**
+
+**Khai báo IP của Syslog server (dưới mục Rule):**
+```
+[root@syslog ~]# vi /etc/rsyslog.conf
+*.*             @Syslog_IP:514
+```
+<img src=https://imgur.com/nh8NWvw.jpg>
+
+**Restart service Rsyslog**
+
+`systemctl restart rsyslog`
+
+### Đối với client Ubuntu
+
+**Khai báo IP của Syslog server trên file mặc định của Rsyslog**
+
+```
+root@ubuntu:/etc# vi /etc/rsyslog.d/50-default.conf 
+*.*             @Syslog_IP:514
+```
+
+<img src=https://imgur.com/0dSKy55.jpg>
+
+**Restart service Rsyslog**
+
+`systemctl restart rsyslog`
+
+### Chuyển qua Rsyslog Server
+
+**Kiểm tra trên thư mục /var/log sẽ xuất hiện 2 thư mục có tên là tên của 2 máy client.**
+
+<img src=https://imgur.com/LfQ3JpI.jpg>
+
+Các bạn có thể thấy xuất hiện thêm 2 thư mục là `/syslog` tên máy client centos và `/ubuntu` tên máy client ubuntu của mình
+
+**Kiểm tra trên thư mục client:**
+
+<img src=https://imgur.com/XKU7XAi.jpg>
+
+Các tệp tin log được đặt theo `SYSLOGFACILITY`
+### Đứng trên Server sử dụng tcpdump bắt gói tin của client gửi sang trên port 514
+
+<img src =https://imgur.com/geVbJzL.jpg>
+
+Khi bật dịch vụ Rsyslog lên, các gói tin từ client sẽ đẩy về Rsyslog Server qua port 514 theo giao thức UDP, vì mình cấu hình theo giao thức này.
+
+### **Đứng trên client bắt gói tin từ client đẩy về server**
+
+VD: Trên Client Ubuntu
+
+Sử dụng lệnh sau đây để bắt 10 gói tin và lưu vào 1 file
+
+`tcpdump dst 66.0.0.199 -c 10 -w tcpdump-01.pcap`
+
+Sau đó sử dụng `tcpdump -r` để đọc file vừa lưu
+
+<img src=https://imgur.com/sVGfcXP.jpg>
+
+VD: Tương tự trên Client CentOS7
+
+<img src=https://imgur.com/yWHVjyn.jpg>
+
+- ***Mặc định port của client sẽ lớn hơn 1024 và sẽ luôn thay đổi.***
+
+- ***Như bạn thấy khi cấu hình Rsyslog, các log trên client sẽ tự động đẩy về Rsyslog Server.***
 
