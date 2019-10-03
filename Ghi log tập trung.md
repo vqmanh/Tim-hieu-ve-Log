@@ -154,6 +154,12 @@ udp6       0      0 :::514                  :::*
 # Nếu bạn sử dụng TCP có thể sử dụng lệnh:  
 netstat -tna | grep :514
 ```
+**Mở port 514**
+```
+firewall-cmd --permanent --add-port=514/udp
+firewall-cmd --permanent --add-port=514/tcp
+firewall-cmd --reload
+```
 <a name = "3b"></a>
 ### b - Cấu hình Rsyslog Client
 
@@ -208,17 +214,14 @@ Khi bật dịch vụ Rsyslog lên, các gói tin từ client sẽ đẩy về R
 
 VD: Trên Client Ubuntu
 
-Sử dụng lệnh sau đây để bắt 10 gói tin và lưu vào 1 file
 
-`tcpdump dst 66.0.0.199 -c 10 -w tcpdump-01.pcap`
-
-Sau đó sử dụng `tcpdump -r` để đọc file vừa lưu
-
-<img src=https://imgur.com/sVGfcXP.jpg>
+<img src=https://imgur.com/nXXGKOr.jpg>
 
 VD: Tương tự trên Client CentOS7
 
-<img src=https://imgur.com/yWHVjyn.jpg>
+<img src=https://imgur.com/EbR0IGM.jpg>
+
+Đây là log được đẩy về khi mình `ssh` vào Client CentOS7
 
 - ***Mặc định port của client sẽ lớn hơn 1024 và sẽ luôn thay đổi.***
 
