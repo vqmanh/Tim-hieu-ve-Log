@@ -139,6 +139,8 @@ Rsyslog Client2|Ubuntu19.04|66.0.0.113|/24|66.0.0.1
 $template RemoteServer, "/var/log/%HOSTNAME%/%SYSLOGFACILITY-TEXT%.log"
 *.* ?RemoteServer
 ```
+- Ngoài ra bạn có thể sửa `%HOSTNAME%` thay bằng `%fromhost-ip%`
+để thư mục trả về sẽ là Ip-server client.
 
 <img src=https://imgur.com/pSeTixx.jpg>
 
@@ -227,3 +229,29 @@ VD: Tương tự trên Client CentOS7
 
 - ***Như bạn thấy khi cấu hình Rsyslog, các log trên client sẽ tự động đẩy về Rsyslog Server.***
 
+## Cấu hình đẩy log Apache về Ryslog Server
+
+### Trên Client đã cài Apache
+
+**Bước 1: Cấu hình file httpd.conf**
+
+`vi /etc/httpd/conf/httpd.conf`
+
+**Thêm dòng sau vào cuối file cấu hình**
+
+```
+CustomLog "| /bin/sh -c '/usr/bin/tee -a /var/log/httpd/httpd-access.log | /usr/bin/logger -thttpd -plocal1.notice'" combined
+ErrorLog "|/bin/sh -c '/usr/bin/tee -a /var/log/httpd/httpd-error.log | /usr/bin/logger -thttpd -plocal1.err'"
+```
+<img src=https://imgur.com/gf1x9dk.jpg>
+
+**Bước 2: Restart dịch vụ**
+
+`systemctl restart httpd`
+
+`systemctl restart rsyslog`
+
+### Kiểm tra trên Rsyslog Server
+
+- Trên Rsyslog Server sẽ xuất hiện file local1.log trên thư mục log của máy Client.
+- File này chứa error log và apache log.
