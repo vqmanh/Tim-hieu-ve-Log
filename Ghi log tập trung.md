@@ -171,14 +171,7 @@ firewall-cmd --permanent --add-port=514/udp
 firewall-cmd --permanent --add-port=514/tcp
 firewall-cmd --reload
 ```
-Tham khảo [tại đây](https://github.com/nhanhoadocs/thuctapsinh/blob/master/NiemDT/Linux/docs/firewalld.md)
 
-***Hoặc đối với Iptables***
-```
-iptables -A INPUT -p udp --dport 514 -j ACCEPT
-iptables -A OUTPUT -p udp --sport 514 -j ACCEPT
-```
-Tham khảo [tại đây](https://github.com/nhanhoadocs/thuctapsinh/blob/5a3f75f3b1ac76562d8efe3080c8906baf373130/ThanhBC/tim-hieu-ve-iptables/bai-lab-co-ban-ve-iptables.md)
 <a name = "3b"></a>
 ### b - Cấu hình Rsyslog Client
 
@@ -306,15 +299,6 @@ $InputFilePollInterval 10 #Cứ sau 10 giây lại gửi tin nhắn
 
 ```
 
-**Ngoài ra, bạn có thể sửa file /etc/rsyslog.conf: uncomment hoặc thêm các dòng sau vào cuối tập tin.**
-```
-$WorkDirectory /var/lib/rsyslog # where to place spool files
-$ActionQueueFileName fwdRule1 # unique name prefix for spool files
-$ActionQueueMaxDiskSpace 1g   # 1gb space limit (use as much as possible)
-$ActionQueueSaveOnShutdown on # save messages to disk on shutdown
-$ActionQueueType LinkedList   # run asynchronously
-$ActionResumeRetryCount -1    # infinite retries if host is down
-```
 **Bước 2: Restart dịch vụ**
 
 `systemctl restart httpd`
