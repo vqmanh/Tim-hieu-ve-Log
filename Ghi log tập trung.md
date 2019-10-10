@@ -151,6 +151,10 @@ $template TmplAuth,"/var/log/%HOSTNAME%/%PROGRAMNAME%.log"
 - Ngoài ra bạn có thể sửa `%HOSTNAME%` thay bằng `%fromhost-ip%`
 để thư mục trả về sẽ là Ip-server client.
 
+```
+$template TmplAuth,"/var/log/%HOSTNAME%/%SYSLOGFACILITY-TEXT%.log"
+*.*     ?TmplAuth
+```
 
 
 **Bước 2: Khởi động lại máy chủ rsyslog của bạn và đảm bảo rằng nó hiện đang lắng nghe trên cổng 514 cho UDP hoặc TCP**
@@ -253,7 +257,8 @@ VD: Tương tự trên Client CentOS7
 
 ## Cấu hình đẩy log Apache về Ryslog Server
 
-### Trên Client đã cài Apache
+### Trên Client CentOS đã cài Apache
+
 
 **Cách 1:**
 
@@ -261,7 +266,7 @@ VD: Tương tự trên Client CentOS7
 
 `vi /etc/httpd/conf/httpd.conf`
 
-**Thêm dòng sau vào cuối file cấu hình đối với Client CentOS**
+**Thêm dòng sau vào cuối file cấu hình**
 
 ```
 CustomLog "| /bin/sh -c '/usr/bin/tee -a /var/log/httpd/httpd-access.log | /usr/bin/logger -thttpd -plocal1.notice'" combined
