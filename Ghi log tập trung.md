@@ -139,12 +139,19 @@ Rsyslog Client2|Ubuntu19.04|66.0.0.113|/24|66.0.0.1
 $template RemoteServer, "/var/log/%HOSTNAME%/%SYSLOGFACILITY-TEXT%.log"
 *.* ?RemoteServer
 ```
+<img src=https://imgur.com/pSeTixx.jpg>
+
+*Với cú pháp này, các tệp cập nhật sẽ được nhóm theo tên máy client gửi `log` và sau đó theo cơ sở `syslog` (kern, user, auth, v.v.)*
+
+HOẶC
+```
+$template TmplAuth,"/var/log/%HOSTNAME%/%PROGRAMNAME%.log"
+*.*     ?TmplAuth
+```
 - Ngoài ra bạn có thể sửa `%HOSTNAME%` thay bằng `%fromhost-ip%`
 để thư mục trả về sẽ là Ip-server client.
 
-<img src=https://imgur.com/pSeTixx.jpg>
 
-*Với cú pháp này, các tệp nhật sẽ được nhóm theo tên máy client gửi `log` và sau đó theo cơ sở `syslog` (kern, user, auth, v.v.)*
 
 **Bước 2: Khởi động lại máy chủ rsyslog của bạn và đảm bảo rằng nó hiện đang lắng nghe trên cổng 514 cho UDP hoặc TCP**
 
@@ -157,20 +164,35 @@ udp6       0      0 :::514                  :::*
 netstat -tna | grep :514
 ```
 **Mở port 514**
+
+***Đối với Firewalld*** 
 ```
 firewall-cmd --permanent --add-port=514/udp
 firewall-cmd --permanent --add-port=514/tcp
 firewall-cmd --reload
 ```
+Tham khảo [tại đây](https://github.com/nhanhoadocs/thuctapsinh/blob/master/NiemDT/Linux/docs/firewalld.md)
+
+***Hoặc đối với Iptables***
+```
+iptables -A INPUT -p udp --dport 514 -j ACCEPT
+iptables -A OUTPUT -p udp --sport 514 -j ACCEPT
+```
+Tham khảo [tại đây](https://github.com/nhanhoadocs/thuctapsinh/blob/5a3f75f3b1ac76562d8efe3080c8906baf373130/ThanhBC/tim-hieu-ve-iptables/bai-lab-co-ban-ve-iptables.md)
 <a name = "3b"></a>
 ### b - Cấu hình Rsyslog Client
+
+**Trên client cũng phải truyền đúng với giao thức như trên server**
+- `*.*  @IPserver:514` : Đối với giao thức UDP
+
+- `*.*  @@IPserver:514` : Đối với giao thức TCP
 
 ### **Đối với client CentOS7**
 
 **Khai báo IP của Syslog server (dưới mục Rule):**
 ```
 [root@syslog ~]# vi /etc/rsyslog.conf
-*.*             @Syslog_IP:514
+*.*             @66.0.0.199:514
 ```
 <img src=https://imgur.com/nh8NWvw.jpg>
 
@@ -184,8 +206,15 @@ firewall-cmd --reload
 
 ```
 root@ubuntu:/etc# vi /etc/rsyslog.d/50-default.conf 
-*.*             @Syslog_IP:514
+*.*             @66.0.0.199:514
 ```
+
+
+
+- VD: @66.0.0.199:514 - UDP
+
+     @@66.0.0.199:514 - TCP
+
 
 <img src=https://imgur.com/0dSKy55.jpg>
 
@@ -233,11 +262,13 @@ VD: Tương tự trên Client CentOS7
 
 ### Trên Client đã cài Apache
 
+**Cách 1:**
+
 **Bước 1: Cấu hình file httpd.conf**
 
 `vi /etc/httpd/conf/httpd.conf`
 
-**Thêm dòng sau vào cuối file cấu hình**
+**Thêm dòng sau vào cuối file cấu hình đối với Client CentOS**
 
 ```
 CustomLog "| /bin/sh -c '/usr/bin/tee -a /var/log/httpd/httpd-access.log | /usr/bin/logger -thttpd -plocal1.notice'" combined
@@ -245,6 +276,45 @@ ErrorLog "|/bin/sh -c '/usr/bin/tee -a /var/log/httpd/httpd-error.log | /usr/bin
 ```
 <img src=https://imgur.com/gf1x9dk.jpg>
 
+
+**Cách 2:**
+
+Tạo và thêm cấu hính sau sau vào file:
+
+`vi /etc/rsyslog.d/apache.conf`
+
+```
+$ModLoad imfile #Dòng này chỉ thêm một lần
+
+# Default Apache Error Log 
+$InputFileName /var/log/httpd/error_log #File log muốn đẩy
+$InputFileTag errorlog #Tên file 
+$InputFileStateFile stat-httpd-error #Trạng thái file
+$InputFileSeverity info #Các log từ mức info trở lên được ghi lại
+$InputFileFacility local3 #Facility log
+$InputRunFileMonitor
+
+# Default Apache Access Log
+$InputFileName /var/log/httpd/access_log
+$InputFileTag accesslog
+$InputFileStateFile stat-httpd-access
+$InputFileSeverity info
+$InputFileFacility local4
+$InputRunFileMonitor
+
+$InputFilePollInterval 10 #Cứ sau 10 giây lại gửi tin nhắn
+
+```
+
+**Ngoài ra, bạn có thể sửa file /etc/rsyslog.conf: uncomment hoặc thêm các dòng sau vào cuối tập tin.**
+```
+$WorkDirectory /var/lib/rsyslog # where to place spool files
+$ActionQueueFileName fwdRule1 # unique name prefix for spool files
+$ActionQueueMaxDiskSpace 1g   # 1gb space limit (use as much as possible)
+$ActionQueueSaveOnShutdown on # save messages to disk on shutdown
+$ActionQueueType LinkedList   # run asynchronously
+$ActionResumeRetryCount -1    # infinite retries if host is down
+```
 **Bước 2: Restart dịch vụ**
 
 `systemctl restart httpd`
@@ -253,5 +323,12 @@ ErrorLog "|/bin/sh -c '/usr/bin/tee -a /var/log/httpd/httpd-error.log | /usr/bin
 
 ### Kiểm tra trên Rsyslog Server
 
-- Trên Rsyslog Server sẽ xuất hiện file local1.log trên thư mục log của máy Client.
-- File này chứa error log và apache log.
+**Chú ý: Với 2 định dạng cấu hình file log đẩy về server**
+ - Định dạng 1: `%PROGRAMNAME%.log` - tên theo các chương trình
+    - Với định dạng này log apache được đẩy về server theo Cách 1 ở trên: file chứa log apache có tên `httpd.log`
+    - Theo cách 2 tên file log sẽ là: `errorlog.log` và `accesslog.log` như cấu hình ở trên
+- Định dạng 2: `%SYSLOGFACILITY-TEXT%.log` tên theo cơ sở sinh ra log
+    - Log apache được đẩy về theo cách 1: tên file chứa log sẽ là local1.log chứa cả errorlog lẫn accesslog
+    - Theo cách 2, tên file chứa log sẽ là local3.log ứng với errorlog, local4.log ứng với accesslog
+
+
