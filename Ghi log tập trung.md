@@ -152,7 +152,7 @@ $template TmplAuth,"/var/log/%HOSTNAME%/%PROGRAMNAME%.log"
 để thư mục trả về sẽ là Ip-server client.
 
 ```
-$template TmplAuth,"/var/log/%HOSTNAME%/%SYSLOGFACILITY-TEXT%.log"
+$template TmplAuth,"/var/log/%fromhost-ip%/%SYSLOGFACILITY-TEXT%.log"
 *.*     ?TmplAuth
 ```
 
