@@ -285,9 +285,8 @@ Tạo và thêm cấu hính sau sau vào file:
 $ModLoad imfile #Dòng này chỉ thêm một lần
 
 # Default Apache Error Log 
-$InputFileName /var/log/httpd/error_log #File log muốn đẩy
+$InputFileName /var/log/httpd/error_log #Đường dẫn file log muốn đẩy
 $InputFileTag errorlog #Tên file 
-$InputFileStateFile stat-httpd-error #Trạng thái file
 $InputFileSeverity info #Các log từ mức info trở lên được ghi lại
 $InputFileFacility local3 #Facility log
 $InputRunFileMonitor
@@ -295,7 +294,6 @@ $InputRunFileMonitor
 # Default Apache Access Log
 $InputFileName /var/log/httpd/access_log
 $InputFileTag accesslog
-$InputFileStateFile stat-httpd-access
 $InputFileSeverity info
 $InputFileFacility local4
 $InputRunFileMonitor
@@ -317,7 +315,19 @@ $InputFilePollInterval 10 #Cứ sau 10 giây lại gửi tin nhắn
     - Với định dạng này log apache được đẩy về server theo Cách 1 ở trên: file chứa log apache có tên `httpd.log`
     - Theo cách 2 tên file log sẽ là: `errorlog.log` và `accesslog.log` như cấu hình ở trên
 - Định dạng 2: `%SYSLOGFACILITY-TEXT%.log` tên theo cơ sở sinh ra log
-    - Log apache được đẩy về theo cách 1: tên file chứa log sẽ là local1.log chứa cả errorlog lẫn accesslog
-    - Theo cách 2, tên file chứa log sẽ là local3.log ứng với errorlog, local4.log ứng với accesslog
+    - Log apache được đẩy về theo cách 1: tên file chứa log sẽ là `local1.log` chứa cả `errorlog` lẫn `accesslog`
+    - Theo cách 2, tên file chứa log sẽ là `local3.log` ứng với `errorlog`, `local4.log` ứng với `accesslog`
 
 
+### Cấu hình lọc accesslog trước khi gửi
+
+**VD: Nếu bạn muốn loại bỏ tất cả mã thông báo trong đó mã trạng thái không phải 404 hoặc 502.** 
+
+Thêm cấu hình sau vào file apache.conf tạo ở trên:
+- Định dạng 1: `%PROGRAMNAME%.log`
+
+`if $programname == 'accesslog' and not ($msg contains '404' or $msg contains '502') then stop`
+
+- Định dạng 2: `%SYSLOGFACILITY-TEXT%.log`
+
+`if $SYSLOGFACILITY-TEXT == 'local4' and not ($msg contains '404' or $msg contains '502') then stop`
