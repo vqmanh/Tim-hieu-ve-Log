@@ -316,3 +316,4 @@ Thêm cấu hình sau vào file apache.conf tạo ở trên:
 
 `if $SYSLOGFACILITY-TEXT == 'local4' and not ($msg contains '404' or $msg contains '502') then stop`
 
+Đọc thêm về [HTTP Status Messages](https://github.com/vqmanh/Tim-hieu-ve-Log/blob/master/Http%20Status%20Messages.md)
