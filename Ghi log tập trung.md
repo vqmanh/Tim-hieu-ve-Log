@@ -25,24 +25,7 @@
 [III - Cấu hình rsyslog để chuyển tiếp log đến máy chủ tập trung](3)
 - [a - Cấu hình rsyslog server](#3a)
 - [b - Cấu hình rsyslog client](#3b)
-
-[IV - Mã hóa tin nhắn rsyslog bằng TLS](#4)
-- [a - Cấu hình quyền chứng chỉ](#4a)
-- [b - Tạo khóa riêng / chung cho máy chủ](#4b)
-- [c - Tạo khóa riêng / chung cho khách hàng](#4c)
-- [d - Gửi các khóa được tạo đến máy chủ](#4d)
-- [e - Cấu hình máy chủ rsyslog](#4e)
-- [f - Cấu hình máy khách rsyslog](4f)
-
-[V - Gửi tin nhắn nhật ký đáng tin cậy với hàng đợi hành động](#5)
-- [a - Thiết kế độ tin cậy của tin nhắn](#5a)
-- [b - Thể hiện độ tin cậy của tin nhắn](#5b)
-
-[VI - Lỗi thông thường](#6)
-
-[VII - Một từ về các giao thức áp suất ngược](#7)
-- [a - Cải tiến kiến ​​trúc](#7a)
-- [b - Hệ thống ghi nhật ký đẩy và kéo](#7b)
+- [c - Cấu hình đẩy log Apache về Ryslog Server](#3c)
 
 ----------------------------
 <a name = "1"></a>
@@ -255,6 +238,7 @@ VD: Tương tự trên Client CentOS7
 
 - ***Như bạn thấy khi cấu hình Rsyslog, các log trên client sẽ tự động đẩy về Rsyslog Server.***
 
+<a name = "3c"></a>
 ## Cấu hình đẩy log Apache về Ryslog Server
 
 ### Trên Client CentOS đã cài Apache
@@ -319,9 +303,9 @@ $InputFilePollInterval 10 #Cứ sau 10 giây lại gửi tin nhắn
     - Theo cách 2, tên file chứa log sẽ là `local3.log` ứng với `errorlog`, `local4.log` ứng với `accesslog`
 
 
-### Cấu hình lọc accesslog trước khi gửi
+### Cấu hình lọc Accesslog trước khi gửi
 
-**VD: Nếu bạn muốn loại bỏ tất cả mã thông báo trong đó mã trạng thái không phải 404 hoặc 502.** 
+**VD: Nếu bạn muốn loại bỏ tất cả mã thông báo trong đó mã trạng thái `http` không phải 404 hoặc 502.** 
 
 Thêm cấu hình sau vào file apache.conf tạo ở trên:
 - Định dạng 1: `%PROGRAMNAME%.log`
@@ -331,3 +315,42 @@ Thêm cấu hình sau vào file apache.conf tạo ở trên:
 - Định dạng 2: `%SYSLOGFACILITY-TEXT%.log`
 
 `if $SYSLOGFACILITY-TEXT == 'local4' and not ($msg contains '404' or $msg contains '502') then stop`
+
+```
+HTTP Status Messages
+
+Các HTTP Status Messages hay còn được biết đển là các http code có 5 loại chính và ý nghĩa các mã cơ bản đó là:
+1xx: Thông tin (yêu cầu (request) đã được nhận, tiếp tục tiến trình xử lí)
+100 Continue: Server đã nhận được yêu cầu header
+101 Switching Protocols
+103 Checkpoint
+2xx: Thành công
+200 OK: yêu cầu gửi lên server đã được tiếp nhận thành công
+201 Created
+202 Accepted
+203 Non-Authoritative Information
+204 No Content
+205 Reset Content
+206 Partial Content
+3xx: Điều hướng
+300 Multiple Choices
+301 Moved Permanently: Trang web yêu cầu đã được chuyển đến một địa chỉ URL mới
+302 Found : Trang web yêu cầu đã được chuyển tạm thời đến một địa chỉ URL mới
+303 See Other
+304 Not Modified
+306 Switch Proxy
+307 Temporary Redirect
+308 Resume Incomplete
+4xx: Lỗi Client
+400 Bad Request: Lỗi cú pháp, yêu cầu không thể thực hiện được
+401 Unauthorized
+402 Payment Required
+403 Forbidden: Không được phép truy cập vào đây
+404 Not Found: Không tìm thấy trang địa chỉ với URL hiện tại
+5xx: Lỗi Server
+500 Internal Server Error: Một thông báo lỗi chung, được đưa ra khi không có thông báo cụ thể nào khác phù hợp
+501 Not Implemented: Máy chủ hoặc không nhận ra phương thức yêu cầu, hoặc nó không có khả năng thực hiện yêu cầu
+502 Bad Gateway: Máy chủ đã hoạt động như một cổng hoặc proxy và nhận được phản hồi không hợp lệ từ máy chủ
+503 Service Unavailable: Máy chủ hiện không có (quá tải)
+504 Gateway Timeout: Máy chủ hoạt động như một gateway hoặc proxy và không nhận được phản hồi kịp thời từ máy chủ phía trên
+```
